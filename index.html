@@ -1,0 +1,1917 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vidyut — India's Live Energy Infrastructure Tracker</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.2.0/dist/chartjs-plugin-datalabels.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-primary: #0a0e1a;
+  --bg-secondary: #111827;
+  --bg-card: #1a2236;
+  --bg-card-hover: #1f2b42;
+  --border: #2a3550;
+  --text-primary: #f1f5f9;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+  --accent-blue: #3b82f6;
+  --accent-cyan: #06b6d4;
+  --accent-green: #10b981;
+  --accent-amber: #f59e0b;
+  --accent-red: #ef4444;
+  --accent-purple: #8b5cf6;
+  --accent-pink: #ec4899;
+  --accent-orange: #f97316;
+  --glow-blue: rgba(59, 130, 246, 0.15);
+  --glow-green: rgba(16, 185, 129, 0.15);
+  --glow-amber: rgba(245, 158, 11, 0.15);
+  --gradient-1: linear-gradient(135deg, #3b82f6, #06b6d4);
+  --gradient-2: linear-gradient(135deg, #10b981, #06b6d4);
+  --gradient-3: linear-gradient(135deg, #f59e0b, #f97316);
+  --gradient-4: linear-gradient(135deg, #8b5cf6, #ec4899);
+  --gradient-5: linear-gradient(135deg, #ef4444, #f97316);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* Animated background */
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(ellipse 80% 50% at 20% 20%, rgba(59,130,246,0.06), transparent),
+    radial-gradient(ellipse 60% 40% at 80% 80%, rgba(139,92,246,0.05), transparent),
+    radial-gradient(ellipse 50% 30% at 50% 50%, rgba(6,182,212,0.04), transparent);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.app { position: relative; z-index: 1; }
+
+/* ===== HEADER ===== */
+.header {
+  background: rgba(17, 24, 39, 0.8);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.header-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+
+.logo-group {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.logo-icon {
+  width: 40px; height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.logo-icon svg {
+  width: 100%; height: 100%;
+}
+
+.logo-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.logo-text h1 {
+  font-size: 1.3rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+  color: var(--text-primary);
+  line-height: 1.1;
+}
+
+.logo-text h1 .logo-dot {
+  color: var(--accent-green);
+}
+
+.logo-subtitle {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.2;
+}
+
+.logo-subtitle .cea-tag {
+  color: var(--text-muted);
+  opacity: 0.7;
+  margin-left: 6px;
+  padding-left: 6px;
+  border-left: 1px solid var(--border);
+}
+
+.header-credit {
+  font-size: 0.65rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+  font-weight: 400;
+  margin-left: 16px;
+  padding-left: 16px;
+  border-left: 1px solid var(--border);
+  align-self: center;
+  white-space: nowrap;
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.live-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--accent-green);
+}
+
+.live-dot {
+  width: 8px; height: 8px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.5; transform: scale(0.8); }
+}
+
+.refresh-btn {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.refresh-btn:hover {
+  background: var(--bg-card-hover);
+  color: var(--text-primary);
+  border-color: var(--accent-blue);
+}
+
+.last-updated {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== NAV TABS ===== */
+.nav-tabs {
+  background: rgba(17, 24, 39, 0.6);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+  padding: 0 2rem;
+  overflow-x: auto;
+  position: sticky;
+  top: 72px;
+  z-index: 99;
+}
+
+.nav-tabs::-webkit-scrollbar { height: 0; }
+
+.nav-inner {
+  max-width: 1600px;
+  margin: 0 auto;
+  display: flex;
+  gap: 2px;
+}
+
+.nav-tab {
+  padding: 14px 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: var(--text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  white-space: nowrap;
+  font-family: inherit;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+}
+
+.nav-tab:hover {
+  color: var(--text-secondary);
+  background: rgba(255,255,255,0.02);
+}
+
+.nav-tab.active {
+  color: var(--accent-blue);
+  border-bottom-color: var(--accent-blue);
+  background: rgba(59, 130, 246, 0.05);
+}
+
+/* ===== MAIN CONTENT ===== */
+.main {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.section { display: none; }
+.section.active { display: block; animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== HERO METRICS ===== */
+.hero-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin-bottom: 2rem;
+}
+
+.hero-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.3s;
+}
+
+.hero-card:hover {
+  border-color: rgba(59,130,246,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 3px;
+}
+
+.hero-card:nth-child(1)::before { background: var(--gradient-1); }
+.hero-card:nth-child(2)::before { background: var(--gradient-2); }
+.hero-card:nth-child(3)::before { background: var(--gradient-3); }
+.hero-card:nth-child(4)::before { background: var(--gradient-4); }
+.hero-card:nth-child(5)::before { background: var(--gradient-5); }
+.hero-card:nth-child(6)::before { background: linear-gradient(135deg, #06b6d4, #3b82f6); }
+
+.hero-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  margin-bottom: 16px;
+}
+
+.hero-card:nth-child(1) .hero-icon { background: rgba(59,130,246,0.15); }
+.hero-card:nth-child(2) .hero-icon { background: rgba(16,185,129,0.15); }
+.hero-card:nth-child(3) .hero-icon { background: rgba(245,158,11,0.15); }
+.hero-card:nth-child(4) .hero-icon { background: rgba(139,92,246,0.15); }
+.hero-card:nth-child(5) .hero-icon { background: rgba(239,68,68,0.15); }
+.hero-card:nth-child(6) .hero-icon { background: rgba(6,182,212,0.15); }
+
+.hero-label {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.hero-value {
+  font-size: 2rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  font-family: 'JetBrains Mono', monospace;
+  line-height: 1.1;
+}
+
+.hero-unit {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 400;
+  margin-left: 4px;
+}
+
+.hero-sub {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  margin-top: 8px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.trend-up { color: var(--accent-green); }
+.trend-down { color: var(--accent-red); }
+
+/* ===== CHART CARDS ===== */
+.chart-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+  margin-bottom: 2rem;
+}
+
+.chart-grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.chart-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  transition: all 0.3s;
+}
+
+.chart-card:hover {
+  border-color: rgba(59,130,246,0.2);
+}
+
+.chart-card.full-width {
+  grid-column: 1 / -1;
+}
+
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.chart-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.chart-subtitle {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+}
+
+.chart-badge {
+  font-size: 0.65rem;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.badge-blue { background: rgba(59,130,246,0.15); color: var(--accent-blue); }
+.badge-green { background: rgba(16,185,129,0.15); color: var(--accent-green); }
+.badge-amber { background: rgba(245,158,11,0.15); color: var(--accent-amber); }
+.badge-purple { background: rgba(139,92,246,0.15); color: var(--accent-purple); }
+
+.chart-container {
+  position: relative;
+  height: 320px;
+}
+
+.chart-container.tall { height: 420px; }
+.chart-container.short { height: 260px; }
+
+/* ===== DATA TABLE ===== */
+.data-table-wrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 2rem;
+}
+
+.table-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.table-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.table-scroll {
+  overflow-x: auto;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+
+thead th {
+  background: rgba(0,0,0,0.3);
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  position: sticky;
+  top: 0;
+  z-index: 1;
+}
+
+tbody td {
+  padding: 10px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+tbody tr:hover {
+  background: rgba(59,130,246,0.04);
+}
+
+tbody tr:hover td {
+  color: var(--text-primary);
+}
+
+/* ===== LOADING ===== */
+.loading-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--bg-primary);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  transition: opacity 0.5s;
+}
+
+.loading-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.loader {
+  width: 60px; height: 60px;
+  border: 3px solid var(--border);
+  border-top-color: var(--accent-blue);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin-bottom: 20px;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+.loading-sub {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  margin-top: 8px;
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* ===== SKELETON ===== */
+.skeleton {
+  background: linear-gradient(90deg, var(--bg-card) 25%, var(--bg-card-hover) 50%, var(--bg-card) 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+  .chart-grid { grid-template-columns: 1fr; }
+  .chart-grid-3 { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 768px) {
+  .header-inner { padding: 0 1rem; }
+  .main { padding: 1rem; }
+  .hero-grid { grid-template-columns: repeat(2, 1fr); }
+  .hero-value { font-size: 1.4rem; }
+  .nav-tabs { padding: 0 1rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-grid { grid-template-columns: 1fr; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+/* Filter/select */
+.filter-bar {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.filter-select {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--text-secondary);
+  padding: 8px 14px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-family: inherit;
+  cursor: pointer;
+  outline: none;
+}
+
+.filter-select:focus {
+  border-color: var(--accent-blue);
+}
+
+.section-title {
+  font-size: 1.6rem;
+  font-weight: 800;
+  margin-bottom: 0.5rem;
+  letter-spacing: -0.02em;
+}
+
+.section-desc {
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+  max-width: 720px;
+}
+
+/* ===== HERO INTRO BANNER ===== */
+.intro-banner {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 36px;
+  margin-bottom: 2rem;
+  position: relative;
+  overflow: hidden;
+}
+
+.intro-banner::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 4px;
+  background: linear-gradient(180deg, #FF9933, #FFFFFF, #138808);
+  border-radius: 4px 0 0 4px;
+}
+
+.intro-headline {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 8px;
+  line-height: 1.2;
+}
+
+.intro-headline .accent {
+  color: var(--accent-green);
+}
+
+.intro-body {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.7;
+  max-width: 700px;
+  margin-bottom: 20px;
+}
+
+.intro-stats {
+  display: flex;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.intro-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.intro-stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+
+.intro-stat-label {
+  font-size: 0.7rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-weight: 600;
+}
+
+/* ===== FOOTER ===== */
+.footer {
+  max-width: 1600px;
+  margin: 0 auto;
+  padding: 2.5rem 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.footer-inner {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.footer-brand h3 {
+  font-size: 1rem;
+  font-weight: 800;
+  margin-bottom: 6px;
+  color: var(--text-primary);
+}
+
+.footer-brand h3 .logo-dot { color: var(--accent-green); }
+
+.footer-brand p {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  max-width: 400px;
+}
+
+.footer-meta {
+  text-align: right;
+  font-size: 0.72rem;
+  color: var(--text-muted);
+  line-height: 1.8;
+}
+
+.footer-meta a {
+  color: var(--accent-blue);
+  text-decoration: none;
+}
+
+.footer-meta a:hover { text-decoration: underline; }
+
+.footer-disclaimer {
+  font-size: 0.68rem;
+  color: var(--text-muted);
+  opacity: 0.6;
+  margin-top: 1.5rem;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255,255,255,0.04);
+  text-align: center;
+  line-height: 1.6;
+}
+</style>
+</head>
+<body>
+
+<!-- Loading Overlay -->
+<div class="loading-overlay" id="loadingOverlay">
+  <div class="loader"></div>
+  <div class="loading-text">Vidyut is loading</div>
+  <div class="loading-sub" id="loadingStatus">Connecting to CEA APIs...</div>
+</div>
+
+<div class="app">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-inner">
+      <div class="logo-group">
+        <div class="logo-icon">
+          <svg viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <!-- Transmission tower / pylon -->
+            <path d="M20 2 L20 38" stroke="#3b82f6" stroke-width="2" stroke-linecap="round"/>
+            <path d="M14 8 L26 8" stroke="#3b82f6" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M12 14 L28 14" stroke="#06b6d4" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M10 20 L30 20" stroke="#10b981" stroke-width="1.5" stroke-linecap="round"/>
+            <!-- Diagonal supports -->
+            <path d="M14 8 L10 20" stroke="#3b82f6" stroke-width="1" opacity="0.5"/>
+            <path d="M26 8 L30 20" stroke="#3b82f6" stroke-width="1" opacity="0.5"/>
+            <path d="M10 20 L14 38" stroke="#06b6d4" stroke-width="1" opacity="0.4"/>
+            <path d="M30 20 L26 38" stroke="#06b6d4" stroke-width="1" opacity="0.4"/>
+            <!-- Power lines radiating out -->
+            <path d="M12 14 L3 10" stroke="#10b981" stroke-width="1" opacity="0.6" stroke-linecap="round"/>
+            <path d="M28 14 L37 10" stroke="#10b981" stroke-width="1" opacity="0.6" stroke-linecap="round"/>
+            <path d="M10 20 L2 22" stroke="#f59e0b" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+            <path d="M30 20 L38 22" stroke="#f59e0b" stroke-width="1" opacity="0.4" stroke-linecap="round"/>
+            <!-- Energy pulse dot -->
+            <circle cx="20" cy="5" r="2.5" fill="#3b82f6" opacity="0.9"/>
+            <circle cx="20" cy="5" r="4" fill="#3b82f6" opacity="0.15"/>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <h1>Vidyut<span class="logo-dot">.</span></h1>
+          <span class="logo-subtitle">India's Live Energy Tracker<span class="cea-tag">CEA Open Data</span></span>
+        </div>
+        <span class="header-credit">by Pavak Patel</span>
+      </div>
+      <div class="header-right">
+        <div class="live-badge">
+          <div class="live-dot"></div>
+          DAILY SYNC
+        </div>
+        <div class="last-updated" id="lastUpdated">--</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Nav Tabs -->
+  <nav class="nav-tabs">
+    <div class="nav-inner">
+      <button class="nav-tab active" data-section="overview">Overview</button>
+      <button class="nav-tab" data-section="capacity">Installed Capacity</button>
+      <button class="nav-tab" data-section="generation">Power Generation</button>
+      <button class="nav-tab" data-section="renewables">Renewables</button>
+      <button class="nav-tab" data-section="supply">Supply Position</button>
+      <button class="nav-tab" data-section="infrastructure">Infrastructure</button>
+      <button class="nav-tab" data-section="percapita">Per Capita</button>
+    </div>
+  </nav>
+
+  <!-- Main Content -->
+  <main class="main">
+
+    <!-- ===== OVERVIEW ===== -->
+    <section class="section active" id="sec-overview">
+      <div class="intro-banner">
+        <div class="intro-headline">Tracking India's Power Grid <span class="accent">in Real Time</span></div>
+        <p class="intro-body">
+          Vidyut aggregates live data from 12 API endpoints published by the Central Electricity Authority to give you a unified view of India's energy landscape &mdash; from installed capacity and generation mix to renewable growth, supply-demand balance, and per-capita consumption across every state.
+        </p>
+        <div class="intro-stats">
+          <div class="intro-stat">
+            <span class="intro-stat-value">12</span>
+            <span class="intro-stat-label">CEA API Endpoints</span>
+          </div>
+          <div class="intro-stat">
+            <span class="intro-stat-value">36+</span>
+            <span class="intro-stat-label">States & UTs Tracked</span>
+          </div>
+          <div class="intro-stat">
+            <span class="intro-stat-value">2019 &ndash; Present</span>
+            <span class="intro-stat-label">Historical Data Range</span>
+          </div>
+          <div class="intro-stat">
+            <span class="intro-stat-value">Daily</span>
+            <span class="intro-stat-label">Auto-Synced via GitHub Actions</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-grid" id="heroGrid">
+        <div class="hero-card">
+          <div class="hero-icon">&#9889;</div>
+          <div class="hero-label">Total Installed Capacity</div>
+          <div class="hero-value" id="h-total-cap">--<span class="hero-unit">MW</span></div>
+          <div class="hero-sub" id="h-total-cap-sub"></div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon">&#127807;</div>
+          <div class="hero-label">Renewable Capacity</div>
+          <div class="hero-value" id="h-res-cap">--<span class="hero-unit">MW</span></div>
+          <div class="hero-sub" id="h-res-pct"></div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon">&#128293;</div>
+          <div class="hero-label">Thermal Capacity</div>
+          <div class="hero-value" id="h-thermal-cap">--<span class="hero-unit">MW</span></div>
+          <div class="hero-sub" id="h-thermal-pct"></div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon">&#9762;</div>
+          <div class="hero-label">Nuclear Capacity</div>
+          <div class="hero-value" id="h-nuclear-cap">--<span class="hero-unit">MW</span></div>
+          <div class="hero-sub" id="h-nuclear-pct"></div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon">&#127754;</div>
+          <div class="hero-label">Hydro Capacity</div>
+          <div class="hero-value" id="h-hydro-cap">--<span class="hero-unit">MW</span></div>
+          <div class="hero-sub" id="h-hydro-pct"></div>
+        </div>
+        <div class="hero-card">
+          <div class="hero-icon">&#9728;</div>
+          <div class="hero-label">Solar Capacity (RES)</div>
+          <div class="hero-value" id="h-solar-cap">--<span class="hero-unit">MW</span></div>
+          <div class="hero-sub" id="h-solar-pct"></div>
+        </div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Capacity Mix</div>
+              <div class="chart-subtitle">Current energy source distribution</div>
+            </div>
+            <span class="chart-badge badge-blue">Latest</span>
+          </div>
+          <div class="chart-container"><canvas id="chartCapMix"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Total Capacity Growth</div>
+              <div class="chart-subtitle">Monthly installed capacity trend</div>
+            </div>
+            <span class="chart-badge badge-green">Trend</span>
+          </div>
+          <div class="chart-container"><canvas id="chartCapGrowth"></canvas></div>
+        </div>
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Capacity by Source Over Time</div>
+              <div class="chart-subtitle">Coal, Gas, Nuclear, Hydro, Renewable</div>
+            </div>
+            <span class="chart-badge badge-purple">Stacked</span>
+          </div>
+          <div class="chart-container tall"><canvas id="chartCapStacked"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== CAPACITY ===== -->
+    <section class="section" id="sec-capacity">
+      <h2 class="section-title">Installed Capacity</h2>
+      <p class="section-desc">How much power can India produce? This section tracks every megawatt of installed generation capacity across coal, gas, nuclear, hydro, and renewables &mdash; broken down by region and state.</p>
+
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Region-wise Capacity</div>
+              <div class="chart-subtitle">Latest figures by region</div>
+            </div>
+            <span class="chart-badge badge-blue">Regions</span>
+          </div>
+          <div class="chart-container"><canvas id="chartRegionCap"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Region Fuel Mix</div>
+              <div class="chart-subtitle">Source breakdown per region</div>
+            </div>
+            <span class="chart-badge badge-amber">Mix</span>
+          </div>
+          <div class="chart-container"><canvas id="chartRegionFuel"></canvas></div>
+        </div>
+      </div>
+
+      <div class="data-table-wrapper">
+        <div class="table-header">
+          <h3>State-wise Installed Capacity (Latest)</h3>
+        </div>
+        <div class="table-scroll">
+          <table id="tableStateCapacity">
+            <thead>
+              <tr>
+                <th>State</th>
+                <th>Coal</th>
+                <th>Gas</th>
+                <th>Diesel</th>
+                <th>Thermal Total</th>
+                <th>Nuclear</th>
+                <th>Hydro</th>
+                <th>RES</th>
+                <th>Grand Total (MW)</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyStateCap"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== GENERATION ===== -->
+    <section class="section" id="sec-generation">
+      <h2 class="section-title">Power Generation</h2>
+      <p class="section-desc">How much electricity is India actually producing? Monthly generation data in Billion Units (BU) across thermal, nuclear, hydro, and renewable sources &mdash; revealing seasonal patterns and the energy transition in action.</p>
+
+      <div class="chart-grid">
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Monthly Generation by Mode</div>
+              <div class="chart-subtitle">Thermal, Nuclear, Hydro, Renewable, Bhutan Import</div>
+            </div>
+            <span class="chart-badge badge-green">BU</span>
+          </div>
+          <div class="chart-container tall"><canvas id="chartGenMode"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Generation Mix (Latest FY)</div>
+              <div class="chart-subtitle">Proportion by generation mode</div>
+            </div>
+            <span class="chart-badge badge-purple">Pie</span>
+          </div>
+          <div class="chart-container"><canvas id="chartGenPie"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Annual Generation Trend</div>
+              <div class="chart-subtitle">Total generation per financial year</div>
+            </div>
+            <span class="chart-badge badge-amber">Yearly</span>
+          </div>
+          <div class="chart-container"><canvas id="chartGenYearly"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== RENEWABLES ===== -->
+    <section class="section" id="sec-renewables">
+      <h2 class="section-title">Renewable Energy</h2>
+      <p class="section-desc">India's clean energy transformation at a glance. Watch solar and wind capacity climb month over month, and see how biomass, small hydro, and waste-to-energy contribute to the country's renewable portfolio.</p>
+
+      <div class="chart-grid">
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Renewable Capacity Growth</div>
+              <div class="chart-subtitle">Solar, Wind, Small Hydro, Biomass, Waste-to-Energy</div>
+            </div>
+            <span class="chart-badge badge-green">MW</span>
+          </div>
+          <div class="chart-container tall"><canvas id="chartRESGrowth"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Renewable Mix (Latest)</div>
+              <div class="chart-subtitle">Current distribution of renewable sources</div>
+            </div>
+            <span class="chart-badge badge-blue">Doughnut</span>
+          </div>
+          <div class="chart-container"><canvas id="chartRESMix"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Solar vs Wind Growth</div>
+              <div class="chart-subtitle">The two dominant renewable sources</div>
+            </div>
+            <span class="chart-badge badge-amber">Trend</span>
+          </div>
+          <div class="chart-container"><canvas id="chartSolarWind"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== SUPPLY POSITION ===== -->
+    <section class="section" id="sec-supply">
+      <h2 class="section-title">Power Supply Position</h2>
+      <p class="section-desc">Is supply keeping up with demand? State-wise comparison of energy required vs available, and peak demand vs peak met &mdash; highlighting where surpluses exist and where deficits persist.</p>
+
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Energy Surplus/Deficit by State</div>
+              <div class="chart-subtitle">Requirement vs Availability (MU)</div>
+            </div>
+            <span class="chart-badge badge-blue">Energy</span>
+          </div>
+          <div class="chart-container tall"><canvas id="chartPSPEnergy"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Peak Demand vs Met</div>
+              <div class="chart-subtitle">State-wise peak power position (MW)</div>
+            </div>
+            <span class="chart-badge badge-amber">Peak</span>
+          </div>
+          <div class="chart-container tall"><canvas id="chartPSPPeak"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== INFRASTRUCTURE ===== -->
+    <section class="section" id="sec-infrastructure">
+      <h2 class="section-title">Transmission Infrastructure</h2>
+      <p class="section-desc">The backbone of India's power grid. Tracking newly commissioned high-voltage transmission lines and transformation substations that carry electricity from generators to the last mile.</p>
+
+      <div class="chart-grid">
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Transmission Lines by Voltage</div>
+              <div class="chart-subtitle">Total circuit km by voltage level</div>
+            </div>
+            <span class="chart-badge badge-purple">Lines</span>
+          </div>
+          <div class="chart-container"><canvas id="chartTransLines"></canvas></div>
+        </div>
+        <div class="chart-card">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Substations by Sector</div>
+              <div class="chart-subtitle">Central vs State sector capacity</div>
+            </div>
+            <span class="chart-badge badge-green">MVA</span>
+          </div>
+          <div class="chart-container"><canvas id="chartSubstations"></canvas></div>
+        </div>
+      </div>
+
+      <div class="data-table-wrapper">
+        <div class="table-header">
+          <h3>Recent Transmission Lines Commissioned</h3>
+        </div>
+        <div class="table-scroll">
+          <table id="tableTransLines">
+            <thead>
+              <tr>
+                <th>Voltage (kV)</th>
+                <th>Line Name</th>
+                <th>Type</th>
+                <th>Agency</th>
+                <th>Length (km)</th>
+                <th>Sector</th>
+              </tr>
+            </thead>
+            <tbody id="tbodyTransLines"></tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ===== PER CAPITA ===== -->
+    <section class="section" id="sec-percapita">
+      <h2 class="section-title">Per Capita Consumption</h2>
+      <p class="section-desc">How electrified is each state? Per capita electricity consumption (kWh/year) reveals the vast disparities across India &mdash; from industrialized states exceeding 2,000 kWh to underserved regions still below the national average.</p>
+
+      <div class="chart-grid">
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Per Capita Consumption by State (Latest Year)</div>
+              <div class="chart-subtitle">kWh per person per year</div>
+            </div>
+            <span class="chart-badge badge-amber">kWh</span>
+          </div>
+          <div class="chart-container tall"><canvas id="chartPerCapita"></canvas></div>
+        </div>
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <div>
+              <div class="chart-title">Per Capita Trend (All India)</div>
+              <div class="chart-subtitle">Historical per capita consumption growth</div>
+            </div>
+            <span class="chart-badge badge-green">Trend</span>
+          </div>
+          <div class="chart-container"><canvas id="chartPerCapTrend"></canvas></div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-brand">
+        <h3>Vidyut<span class="logo-dot">.</span></h3>
+        <p>An open-source personal project that aggregates India's electricity data into a single, live dashboard. Built to make public energy data more accessible and understandable.</p>
+      </div>
+      <div class="footer-meta">
+        Data sourced from <a href="https://cea.nic.in" target="_blank" rel="noopener">Central Electricity Authority</a><br>
+        Government of India, Ministry of Power<br>
+        Built by Pavak Patel
+      </div>
+    </div>
+    <div class="footer-disclaimer">
+      Data is fetched periodically from CEA's public APIs and may not reflect real-time grid status. This project is not affiliated with or endorsed by CEA or the Government of India. All data remains the property of its original source.
+    </div>
+  </footer>
+</div>
+
+<script>
+// ===== GLOBALS =====
+const DATA_BASE = './data';
+const API_FILES = {
+  instcap_res: 'instcap_res.json',
+  installed_capacity_allindia: 'installed_capacity_allindia.json',
+  installed_capacity_region: 'installed_capacity_region.json',
+  installed_capacity_state: 'installed_capacity_state.json',
+  psp_energy: 'psp_energy.json',
+  psp_peak: 'psp_peak.json',
+  transformation: 'transformation.json',
+  transmission: 'transmission.json',
+  power_generation: 'power_generation.json',
+  renewable_energy: 'renewable_energy.json',
+  capacity_composition: 'capacity_composition.json',
+  percapita: 'percapita.json',
+};
+const charts = {};
+let allData = {};
+
+// Color palettes
+const COLORS = {
+  coal: '#6b7280',
+  gas: '#f59e0b',
+  diesel: '#ef4444',
+  thermal: '#f97316',
+  nuclear: '#8b5cf6',
+  hydro: '#3b82f6',
+  res: '#10b981',
+  solar: '#fbbf24',
+  wind: '#06b6d4',
+  biomass: '#84cc16',
+  waste: '#a855f7',
+  smallHydro: '#0ea5e9',
+  region: ['#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', '#06b6d4'],
+};
+
+const CHART_DEFAULTS = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+    legend: {
+      labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, padding: 16, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 }
+    },
+    tooltip: {
+      backgroundColor: 'rgba(17,24,39,0.95)',
+      titleColor: '#f1f5f9',
+      bodyColor: '#94a3b8',
+      borderColor: '#2a3550',
+      borderWidth: 1,
+      cornerRadius: 8,
+      padding: 12,
+      titleFont: { family: 'Inter', weight: '600' },
+      bodyFont: { family: 'JetBrains Mono', size: 12 },
+      callbacks: {
+        label: ctx => {
+          let v = ctx.parsed.y ?? ctx.parsed ?? ctx.raw;
+          if (typeof v === 'number') v = v.toLocaleString('en-IN', { maximumFractionDigits: 1 });
+          return ` ${ctx.dataset.label || ''}: ${v}`;
+        }
+      }
+    }
+  },
+  scales: {
+    x: {
+      grid: { color: 'rgba(255,255,255,0.04)' },
+      ticks: { color: '#64748b', font: { family: 'Inter', size: 10 } }
+    },
+    y: {
+      grid: { color: 'rgba(255,255,255,0.04)' },
+      ticks: {
+        color: '#64748b',
+        font: { family: 'JetBrains Mono', size: 10 },
+        callback: v => v >= 1000 ? (v/1000).toFixed(0) + 'k' : v
+      }
+    }
+  }
+};
+
+// ===== UTILITIES =====
+function fmt(n) {
+  if (n == null || isNaN(n)) return '--';
+  return Number(n).toLocaleString('en-IN', { maximumFractionDigits: 0 });
+}
+
+function pct(part, whole) {
+  if (!whole) return '0';
+  return ((part / whole) * 100).toFixed(1);
+}
+
+function makeGradient(ctx, c1, c2) {
+  const g = ctx.createLinearGradient(0, 0, 0, 400);
+  g.addColorStop(0, c1);
+  g.addColorStop(1, c2);
+  return g;
+}
+
+function getLatest(arr) {
+  if (!arr || !arr.length) return null;
+  return arr[arr.length - 1];
+}
+
+function getLast12(arr) {
+  if (!arr) return [];
+  return arr.slice(-12);
+}
+
+function getLast24(arr) {
+  if (!arr) return [];
+  return arr.slice(-24);
+}
+
+async function fetchAPI(name) {
+  const file = API_FILES[name];
+  if (!file) { console.error(`Unknown API: ${name}`); return null; }
+  try {
+    const r = await fetch(`${DATA_BASE}/${file}`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return await r.json();
+  } catch(e) {
+    console.error(`Failed to load ${name}:`, e);
+    return null;
+  }
+}
+
+// Horizontal bar chart options helper
+function hBarOptions(extra = {}) {
+  return {
+    responsive: true, maintainAspectRatio: false, indexAxis: 'y',
+    plugins: { ...CHART_DEFAULTS.plugins, legend: extra.legend === false ? { display: false } : CHART_DEFAULTS.plugins.legend },
+    scales: {
+      x: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 }, callback: v => v >= 1000 ? (v/1000).toFixed(0) + 'k' : v } },
+      y: { grid: { color: 'rgba(255,255,255,0.04)' }, ticks: { color: '#94a3b8', font: { family: 'Inter', size: 10 } } }
+    }
+  };
+}
+
+// ===== NAV =====
+document.querySelectorAll('.nav-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+    tab.classList.add('active');
+    document.getElementById('sec-' + tab.dataset.section).classList.add('active');
+  });
+});
+
+// ===== DATA LOADING =====
+async function loadAll() {
+  const status = document.getElementById('loadingStatus');
+  try {
+    status.textContent = 'Fetching installed capacity...';
+    const [capAll, capRes, capRegion, capState, capComp] = await Promise.all([
+      fetchAPI('installed_capacity_allindia'),
+      fetchAPI('instcap_res'),
+      fetchAPI('installed_capacity_region'),
+      fetchAPI('installed_capacity_state'),
+      fetchAPI('capacity_composition'),
+    ]);
+
+    status.textContent = 'Fetching generation & supply data...';
+    const [powerGen, renewable, pspEnergy, pspPeak] = await Promise.all([
+      fetchAPI('power_generation'),
+      fetchAPI('renewable_energy'),
+      fetchAPI('psp_energy'),
+      fetchAPI('psp_peak'),
+    ]);
+
+    status.textContent = 'Fetching infrastructure & per capita data...';
+    const [transmission, transformation, percapita] = await Promise.all([
+      fetchAPI('transmission'),
+      fetchAPI('transformation'),
+      fetchAPI('percapita'),
+    ]);
+
+    allData = { capAll, capRes, capRegion, capState, capComp, powerGen, renewable, pspEnergy, pspPeak, transmission, transformation, percapita };
+
+    status.textContent = 'Rendering dashboard...';
+    renderAll();
+
+    document.getElementById('loadingOverlay').classList.add('hidden');
+    document.getElementById('lastUpdated').textContent = 'Updated: ' + new Date().toLocaleTimeString();
+  } catch(e) {
+    console.error('loadAll error:', e);
+    status.textContent = 'Error loading data. Retrying in 5s...';
+    setTimeout(loadAll, 5000);
+  }
+}
+
+// ===== RENDERING =====
+function renderAll() {
+  renderHeroCards();
+  renderOverviewCharts();
+  renderCapacitySection();
+  renderGenerationSection();
+  renderRenewablesSection();
+  renderSupplySection();
+  renderInfraSection();
+  renderPerCapitaSection();
+}
+
+// --- HERO CARDS ---
+function renderHeroCards() {
+  const d = allData.capAll;
+  if (!d || !d.length) return;
+  const latest = d[d.length - 1];
+  const prev = d.length > 12 ? d[d.length - 13] : d[0];
+
+  const total = parseFloat(latest.grand_total);
+  const coal = parseFloat(latest.coal);
+  const gas = parseFloat(latest.gas);
+  const thermal = parseFloat(latest.thermal_total);
+  const nuclear = parseFloat(latest.nuclear);
+  const hydro = parseFloat(latest.hydro);
+  const res = parseFloat(latest.res);
+
+  const prevTotal = parseFloat(prev.grand_total);
+  const growth = ((total - prevTotal) / prevTotal * 100).toFixed(1);
+
+  document.getElementById('h-total-cap').innerHTML = fmt(total) + '<span class="hero-unit">MW</span>';
+  document.getElementById('h-total-cap-sub').innerHTML = `<span class="trend-up">+${growth}%</span> vs last year | ${latest.month || latest.Month}`;
+
+  document.getElementById('h-res-cap').innerHTML = fmt(res) + '<span class="hero-unit">MW</span>';
+  document.getElementById('h-res-pct').textContent = pct(res, total) + '% of total capacity';
+
+  document.getElementById('h-thermal-cap').innerHTML = fmt(thermal) + '<span class="hero-unit">MW</span>';
+  document.getElementById('h-thermal-pct').textContent = pct(thermal, total) + '% of total | Coal: ' + fmt(coal) + ' MW';
+
+  document.getElementById('h-nuclear-cap').innerHTML = fmt(nuclear) + '<span class="hero-unit">MW</span>';
+  document.getElementById('h-nuclear-pct').textContent = pct(nuclear, total) + '% of total capacity';
+
+  document.getElementById('h-hydro-cap').innerHTML = fmt(hydro) + '<span class="hero-unit">MW</span>';
+  document.getElementById('h-hydro-pct').textContent = pct(hydro, total) + '% of total capacity';
+
+  // Solar from RES data
+  const resData = allData.capRes;
+  if (resData && resData.length) {
+    const latestRes = resData[resData.length - 1];
+    const solar = parseFloat(latestRes.solar_power);
+    document.getElementById('h-solar-cap').innerHTML = fmt(solar) + '<span class="hero-unit">MW</span>';
+    document.getElementById('h-solar-pct').textContent = pct(solar, total) + '% of total capacity';
+  }
+}
+
+// --- OVERVIEW CHARTS ---
+function renderOverviewCharts() {
+  const d = allData.capAll;
+  if (!d || !d.length) return;
+  const latest = d[d.length - 1];
+
+  // Capacity Mix Doughnut
+  const mixCtx = document.getElementById('chartCapMix').getContext('2d');
+  if (charts.capMix) charts.capMix.destroy();
+  charts.capMix = new Chart(mixCtx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Coal', 'Gas', 'Diesel', 'Nuclear', 'Hydro', 'Renewables'],
+      datasets: [{
+        data: [latest.coal, latest.gas, latest.diesel, latest.nuclear, latest.hydro, latest.res].map(Number),
+        backgroundColor: [COLORS.coal, COLORS.gas, COLORS.diesel, COLORS.nuclear, COLORS.hydro, COLORS.res],
+        borderWidth: 0,
+        hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      cutout: '65%',
+      plugins: {
+        legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, padding: 12, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } },
+        tooltip: CHART_DEFAULTS.plugins.tooltip
+      }
+    }
+  });
+
+  // Capacity Growth Line
+  const last24 = getLast24(d);
+  const growthCtx = document.getElementById('chartCapGrowth').getContext('2d');
+  const gradient = makeGradient(growthCtx, 'rgba(59,130,246,0.3)', 'rgba(59,130,246,0)');
+  if (charts.capGrowth) charts.capGrowth.destroy();
+  charts.capGrowth = new Chart(growthCtx, {
+    type: 'line',
+    data: {
+      labels: last24.map(r => r.month || r.Month),
+      datasets: [{
+        label: 'Total Capacity (MW)',
+        data: last24.map(r => parseFloat(r.grand_total)),
+        borderColor: '#3b82f6',
+        backgroundColor: gradient,
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2.5,
+        pointRadius: 0,
+        pointHoverRadius: 5
+      }]
+    },
+    options: { ...CHART_DEFAULTS }
+  });
+
+  // Stacked Area
+  const stackCtx = document.getElementById('chartCapStacked').getContext('2d');
+  if (charts.capStacked) charts.capStacked.destroy();
+  charts.capStacked = new Chart(stackCtx, {
+    type: 'line',
+    data: {
+      labels: last24.map(r => r.month || r.Month),
+      datasets: [
+        { label: 'Coal', data: last24.map(r => +r.coal), backgroundColor: 'rgba(107,114,128,0.6)', borderColor: COLORS.coal, fill: true, tension: 0.3, borderWidth: 1.5, pointRadius: 0 },
+        { label: 'Gas', data: last24.map(r => +r.gas), backgroundColor: 'rgba(245,158,11,0.5)', borderColor: COLORS.gas, fill: true, tension: 0.3, borderWidth: 1.5, pointRadius: 0 },
+        { label: 'Nuclear', data: last24.map(r => +r.nuclear), backgroundColor: 'rgba(139,92,246,0.5)', borderColor: COLORS.nuclear, fill: true, tension: 0.3, borderWidth: 1.5, pointRadius: 0 },
+        { label: 'Hydro', data: last24.map(r => +r.hydro), backgroundColor: 'rgba(59,130,246,0.5)', borderColor: COLORS.hydro, fill: true, tension: 0.3, borderWidth: 1.5, pointRadius: 0 },
+        { label: 'Renewables', data: last24.map(r => +r.res), backgroundColor: 'rgba(16,185,129,0.5)', borderColor: COLORS.res, fill: true, tension: 0.3, borderWidth: 1.5, pointRadius: 0 },
+      ]
+    },
+    options: { ...CHART_DEFAULTS, scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, stacked: true } }, plugins: { ...CHART_DEFAULTS.plugins } }
+  });
+}
+
+// --- CAPACITY SECTION ---
+function renderCapacitySection() {
+  const d = allData.capRegion;
+  if (!d || !d.length) return;
+
+  // Get latest month data (last 5-6 rows = regions)
+  const latestMonth = d[d.length - 1].Month;
+  const regionData = d.filter(r => r.Month === latestMonth);
+
+  // Region bar chart
+  const ctx1 = document.getElementById('chartRegionCap').getContext('2d');
+  if (charts.regionCap) charts.regionCap.destroy();
+  charts.regionCap = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: regionData.map(r => r.Region),
+      datasets: [{
+        label: 'Total Capacity (MW)',
+        data: regionData.map(r => parseFloat(r.Total)),
+        backgroundColor: COLORS.region,
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } } }
+  });
+
+  // Region fuel mix stacked bar
+  const ctx2 = document.getElementById('chartRegionFuel').getContext('2d');
+  if (charts.regionFuel) charts.regionFuel.destroy();
+  charts.regionFuel = new Chart(ctx2, {
+    type: 'bar',
+    data: {
+      labels: regionData.map(r => r.Region),
+      datasets: [
+        { label: 'Coal', data: regionData.map(r => +r.Coal), backgroundColor: COLORS.coal, borderRadius: 2 },
+        { label: 'Gas', data: regionData.map(r => +r.Gas), backgroundColor: COLORS.gas, borderRadius: 2 },
+        { label: 'Nuclear', data: regionData.map(r => +r.Nuclear), backgroundColor: COLORS.nuclear, borderRadius: 2 },
+        { label: 'Hydro', data: regionData.map(r => +r.Hydro), backgroundColor: COLORS.hydro, borderRadius: 2 },
+        { label: 'RES', data: regionData.map(r => +r.RES), backgroundColor: COLORS.res, borderRadius: 2 },
+      ]
+    },
+    options: { ...CHART_DEFAULTS, scales: { ...CHART_DEFAULTS.scales, x: { ...CHART_DEFAULTS.scales.x, stacked: true }, y: { ...CHART_DEFAULTS.scales.y, stacked: true } } }
+  });
+
+  // State table
+  const sd = allData.capState;
+  if (sd && sd.length) {
+    const latestStateMonth = sd[sd.length - 1].month;
+    const stateRows = sd.filter(r => r.month === latestStateMonth);
+    const tbody = document.getElementById('tbodyStateCap');
+    tbody.innerHTML = stateRows.map(r => `
+      <tr>
+        <td style="color:var(--text-primary);font-family:Inter;font-weight:500">${r.state}</td>
+        <td>${fmt(+r.coal)}</td>
+        <td>${fmt(+r.gas)}</td>
+        <td>${fmt(+r.diesel)}</td>
+        <td>${fmt(+r.thermal_total)}</td>
+        <td>${fmt(+r.nuclear)}</td>
+        <td>${fmt(+r.hydro)}</td>
+        <td>${fmt(+r.res)}</td>
+        <td style="color:var(--accent-blue);font-weight:600">${fmt(+r.grand_total)}</td>
+      </tr>
+    `).join('');
+  }
+}
+
+// --- GENERATION SECTION ---
+function renderGenerationSection() {
+  const raw = allData.powerGen;
+  if (!raw) return;
+
+  // Flatten - data is nested by FY
+  const fys = Object.keys(raw).sort();
+  const recentFYs = fys.slice(-3);
+
+  // Aggregate by FY & mode
+  const fyTotals = {};
+  const monthlyData = [];
+
+  for (const fy of fys) {
+    if (!raw[fy]) continue;
+    fyTotals[fy] = {};
+    for (const entry of raw[fy]) {
+      if (entry.Region_State !== 'All India') continue;
+      const mode = entry.mode;
+      const val = parseFloat(entry.bus) || 0;
+      if (!fyTotals[fy][mode]) fyTotals[fy][mode] = 0;
+      fyTotals[fy][mode] += val;
+
+      if (recentFYs.includes(fy)) {
+        monthlyData.push({ month: entry.Month, fy, mode, val });
+      }
+    }
+  }
+
+  // Monthly chart for recent FYs
+  const modes = ['THERMAL', 'NUCLEAR', 'HYDRO', 'RENEWABLE'];
+  const modeColors = { THERMAL: COLORS.thermal, NUCLEAR: COLORS.nuclear, HYDRO: COLORS.hydro, RENEWABLE: COLORS.res, 'BHUTAN IMP': '#94a3b8', 'BHUTAN IMP_Hydro': '#94a3b8' };
+
+  // Group monthly by month label
+  const monthLabels = [...new Set(monthlyData.map(d => d.month))];
+  const monthMap = {};
+  for (const d of monthlyData) {
+    if (!monthMap[d.month]) monthMap[d.month] = {};
+    if (!monthMap[d.month][d.mode]) monthMap[d.month][d.mode] = 0;
+    monthMap[d.month][d.mode] += d.val;
+  }
+
+  const ctx1 = document.getElementById('chartGenMode').getContext('2d');
+  if (charts.genMode) charts.genMode.destroy();
+  charts.genMode = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: monthLabels.slice(-24),
+      datasets: modes.map(mode => ({
+        label: mode,
+        data: monthLabels.slice(-24).map(m => (monthMap[m] && monthMap[m][mode]) || 0),
+        backgroundColor: modeColors[mode] || '#64748b',
+        borderRadius: 2
+      }))
+    },
+    options: { ...CHART_DEFAULTS, scales: { ...CHART_DEFAULTS.scales, x: { ...CHART_DEFAULTS.scales.x, stacked: true }, y: { ...CHART_DEFAULTS.scales.y, stacked: true } } }
+  });
+
+  // Pie for latest FY
+  const latestFY = fys[fys.length - 1];
+  const latestTotals = fyTotals[latestFY] || {};
+  const pieLabels = Object.keys(latestTotals).filter(k => latestTotals[k] > 0);
+  const ctx2 = document.getElementById('chartGenPie').getContext('2d');
+  if (charts.genPie) charts.genPie.destroy();
+  charts.genPie = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: pieLabels,
+      datasets: [{
+        data: pieLabels.map(k => latestTotals[k].toFixed(2)),
+        backgroundColor: pieLabels.map(k => modeColors[k] || '#64748b'),
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } }, tooltip: CHART_DEFAULTS.plugins.tooltip }
+    }
+  });
+
+  // Yearly trend
+  const yearlyLabels = fys.filter(fy => fy !== '1969-1970');
+  const yearlyTotals = yearlyLabels.map(fy => {
+    const t = fyTotals[fy];
+    return Object.values(t).reduce((a, b) => a + b, 0);
+  });
+
+  const ctx3 = document.getElementById('chartGenYearly').getContext('2d');
+  const g = makeGradient(ctx3, 'rgba(16,185,129,0.3)', 'rgba(16,185,129,0)');
+  if (charts.genYearly) charts.genYearly.destroy();
+  charts.genYearly = new Chart(ctx3, {
+    type: 'line',
+    data: {
+      labels: yearlyLabels,
+      datasets: [{
+        label: 'Total Generation (BU)',
+        data: yearlyTotals,
+        borderColor: COLORS.res,
+        backgroundColor: g,
+        fill: true,
+        tension: 0.4,
+        borderWidth: 2.5,
+        pointRadius: 0,
+        pointHoverRadius: 5
+      }]
+    },
+    options: { ...CHART_DEFAULTS }
+  });
+}
+
+// --- RENEWABLES SECTION ---
+function renderRenewablesSection() {
+  const d = allData.capRes;
+  if (!d || !d.length) return;
+
+  const last24 = d.slice(-24);
+  const latest = d[d.length - 1];
+
+  // Stacked area growth
+  const ctx1 = document.getElementById('chartRESGrowth').getContext('2d');
+  if (charts.resGrowth) charts.resGrowth.destroy();
+  charts.resGrowth = new Chart(ctx1, {
+    type: 'line',
+    data: {
+      labels: last24.map(r => r.Month),
+      datasets: [
+        { label: 'Solar', data: last24.map(r => +r.solar_power), backgroundColor: 'rgba(251,191,36,0.5)', borderColor: COLORS.solar, fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+        { label: 'Wind', data: last24.map(r => +r.wind_power), backgroundColor: 'rgba(6,182,212,0.5)', borderColor: COLORS.wind, fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+        { label: 'Small Hydro', data: last24.map(r => +r.small_hydro_power), backgroundColor: 'rgba(14,165,233,0.4)', borderColor: COLORS.smallHydro, fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+        { label: 'Biomass', data: last24.map(r => +r.bmpower_congen), backgroundColor: 'rgba(132,204,22,0.4)', borderColor: COLORS.biomass, fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+        { label: 'Waste-to-Energy', data: last24.map(r => +r.wastetoenergy), backgroundColor: 'rgba(168,85,247,0.4)', borderColor: COLORS.waste, fill: true, tension: 0.3, borderWidth: 2, pointRadius: 0 },
+      ]
+    },
+    options: { ...CHART_DEFAULTS, scales: { ...CHART_DEFAULTS.scales, y: { ...CHART_DEFAULTS.scales.y, stacked: true } } }
+  });
+
+  // Doughnut mix
+  const ctx2 = document.getElementById('chartRESMix').getContext('2d');
+  if (charts.resMix) charts.resMix.destroy();
+  charts.resMix = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: ['Solar', 'Wind', 'Small Hydro', 'Biomass', 'Waste-to-Energy'],
+      datasets: [{
+        data: [+latest.solar_power, +latest.wind_power, +latest.small_hydro_power, +latest.bmpower_congen, +latest.wastetoenergy],
+        backgroundColor: [COLORS.solar, COLORS.wind, COLORS.smallHydro, COLORS.biomass, COLORS.waste],
+        borderWidth: 0, hoverOffset: 8
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } }, tooltip: CHART_DEFAULTS.plugins.tooltip }
+    }
+  });
+
+  // Solar vs Wind line
+  const ctx3 = document.getElementById('chartSolarWind').getContext('2d');
+  if (charts.solarWind) charts.solarWind.destroy();
+  const allMonths = d.slice(-36);
+  charts.solarWind = new Chart(ctx3, {
+    type: 'line',
+    data: {
+      labels: allMonths.map(r => r.Month),
+      datasets: [
+        { label: 'Solar', data: allMonths.map(r => +r.solar_power), borderColor: COLORS.solar, backgroundColor: 'rgba(251,191,36,0.1)', fill: true, tension: 0.4, borderWidth: 2.5, pointRadius: 0 },
+        { label: 'Wind', data: allMonths.map(r => +r.wind_power), borderColor: COLORS.wind, backgroundColor: 'rgba(6,182,212,0.1)', fill: true, tension: 0.4, borderWidth: 2.5, pointRadius: 0 },
+      ]
+    },
+    options: CHART_DEFAULTS
+  });
+}
+
+// --- SUPPLY SECTION ---
+function renderSupplySection() {
+  // Energy
+  const eRaw = allData.pspEnergy;
+  if (eRaw) {
+    const fys = Object.keys(eRaw).sort();
+    const latestFY = fys[fys.length - 1];
+    const fyData = eRaw[latestFY] || [];
+    // Get latest month, filter out region rows
+    const months = [...new Set(fyData.map(r => r.Month))];
+    const latestMonth = months[months.length - 1];
+    const stateRows = fyData.filter(r => r.Month === latestMonth && !r.State.includes('Region') && !r.State.includes('All India'));
+    const top15 = stateRows.sort((a,b) => +b.energy_requirement - +a.energy_requirement).slice(0, 15);
+
+    const ctx1 = document.getElementById('chartPSPEnergy').getContext('2d');
+    if (charts.pspEnergy) charts.pspEnergy.destroy();
+    charts.pspEnergy = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels: top15.map(r => r.State.trim()),
+        datasets: [
+          { label: 'Requirement (MU)', data: top15.map(r => +r.energy_requirement), backgroundColor: 'rgba(59,130,246,0.7)', borderRadius: 4 },
+          { label: 'Availability (MU)', data: top15.map(r => +r.energy_availability), backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 4 },
+        ]
+      },
+      options: hBarOptions()
+    });
+  }
+
+  // Peak
+  const pRaw = allData.pspPeak;
+  if (pRaw) {
+    const fys = Object.keys(pRaw).sort();
+    const latestFY = fys[fys.length - 1];
+    const fyData = pRaw[latestFY] || [];
+    const months = [...new Set(fyData.map(r => r.Month))];
+    const latestMonth = months[months.length - 1];
+    const stateRows = fyData.filter(r => r.Month === latestMonth && !r.State.includes('Region') && !r.State.includes('All India'));
+    const top15 = stateRows.sort((a,b) => +b.peak_demand - +a.peak_demand).slice(0, 15);
+
+    const ctx2 = document.getElementById('chartPSPPeak').getContext('2d');
+    if (charts.pspPeak) charts.pspPeak.destroy();
+    charts.pspPeak = new Chart(ctx2, {
+      type: 'bar',
+      data: {
+        labels: top15.map(r => r.State.trim()),
+        datasets: [
+          { label: 'Peak Demand (MW)', data: top15.map(r => +r.peak_demand), backgroundColor: 'rgba(245,158,11,0.7)', borderRadius: 4 },
+          { label: 'Peak Met (MW)', data: top15.map(r => +r.peak_met), backgroundColor: 'rgba(139,92,246,0.7)', borderRadius: 4 },
+        ]
+      },
+      options: hBarOptions()
+    });
+  }
+}
+
+// --- INFRASTRUCTURE SECTION ---
+function renderInfraSection() {
+  // Transmission lines by voltage
+  const tl = allData.transmission;
+  if (tl && tl.length) {
+    const voltageMap = {};
+    for (const r of tl) {
+      const v = r.voltage_level + ' kV';
+      if (!voltageMap[v]) voltageMap[v] = 0;
+      voltageMap[v] += parseFloat(r.line_length) || 0;
+    }
+    const labels = Object.keys(voltageMap).sort((a,b) => parseInt(a) - parseInt(b));
+
+    const ctx1 = document.getElementById('chartTransLines').getContext('2d');
+    if (charts.transLines) charts.transLines.destroy();
+    charts.transLines = new Chart(ctx1, {
+      type: 'bar',
+      data: {
+        labels,
+        datasets: [{
+          label: 'Total Circuit km',
+          data: labels.map(l => voltageMap[l]),
+          backgroundColor: COLORS.region,
+          borderRadius: 6
+        }]
+      },
+      options: { ...CHART_DEFAULTS, plugins: { ...CHART_DEFAULTS.plugins, legend: { display: false } } }
+    });
+
+    // Table
+    const recentLines = tl.slice(-30);
+    const tbody = document.getElementById('tbodyTransLines');
+    tbody.innerHTML = recentLines.map(r => `
+      <tr>
+        <td>${r.voltage_level} kV</td>
+        <td style="color:var(--text-primary);font-family:Inter;max-width:300px;overflow:hidden;text-overflow:ellipsis">${r.transmission_line}</td>
+        <td>${r.circuit_type}</td>
+        <td>${r.executing_agency}</td>
+        <td>${r.line_length}</td>
+        <td>${r.sector}</td>
+      </tr>
+    `).join('');
+  }
+
+  // Substations by sector
+  const ts = allData.transformation;
+  if (ts && ts.length) {
+    const sectorMap = {};
+    for (const r of ts) {
+      const s = r.sector || 'Unknown';
+      if (!sectorMap[s]) sectorMap[s] = 0;
+      sectorMap[s] += parseFloat(r.capacity) || 0;
+    }
+    const labels = Object.keys(sectorMap);
+
+    const ctx2 = document.getElementById('chartSubstations').getContext('2d');
+    if (charts.substations) charts.substations.destroy();
+    charts.substations = new Chart(ctx2, {
+      type: 'doughnut',
+      data: {
+        labels,
+        datasets: [{
+          data: labels.map(l => sectorMap[l]),
+          backgroundColor: [COLORS.hydro, COLORS.res, COLORS.nuclear, COLORS.gas],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '55%',
+        plugins: { legend: { position: 'right', labels: { color: '#94a3b8', font: { family: 'Inter', size: 11 }, usePointStyle: true, pointStyle: 'circle', boxWidth: 8, boxHeight: 8 } }, tooltip: CHART_DEFAULTS.plugins.tooltip }
+      }
+    });
+  }
+}
+
+// --- PER CAPITA SECTION ---
+function renderPerCapitaSection() {
+  const d = allData.percapita;
+  if (!d || !d.length) return;
+
+  // Get latest year
+  const years = [...new Set(d.map(r => r.Year))].sort();
+  const latestYear = years[years.length - 1];
+  const latestData = d.filter(r => r.Year === latestYear && r.State !== 'All India' && parseFloat(r.value) > 0);
+  latestData.sort((a, b) => parseFloat(b.value) - parseFloat(a.value));
+  const top20 = latestData.slice(0, 25);
+
+  const ctx1 = document.getElementById('chartPerCapita').getContext('2d');
+  if (charts.perCapita) charts.perCapita.destroy();
+
+  const vals = top20.map(r => parseFloat(r.value));
+  const maxVal = Math.max(...vals);
+  const barColors = vals.map(v => {
+    const ratio = v / maxVal;
+    if (ratio > 0.7) return COLORS.res;
+    if (ratio > 0.4) return COLORS.hydro;
+    return COLORS.gas;
+  });
+
+  charts.perCapita = new Chart(ctx1, {
+    type: 'bar',
+    data: {
+      labels: top20.map(r => r.State.trim()),
+      datasets: [{
+        label: 'kWh per capita (' + latestYear + ')',
+        data: vals,
+        backgroundColor: barColors,
+        borderRadius: 4
+      }]
+    },
+    options: hBarOptions({ legend: false })
+  });
+
+  // All India trend
+  const allIndia = d.filter(r => r.State === 'All India').sort((a,b) => a.Year.localeCompare(b.Year));
+  if (allIndia.length) {
+    const ctx2 = document.getElementById('chartPerCapTrend').getContext('2d');
+    const g = makeGradient(ctx2, 'rgba(245,158,11,0.3)', 'rgba(245,158,11,0)');
+    if (charts.perCapTrend) charts.perCapTrend.destroy();
+    charts.perCapTrend = new Chart(ctx2, {
+      type: 'line',
+      data: {
+        labels: allIndia.map(r => r.Year),
+        datasets: [{
+          label: 'All India Per Capita (kWh)',
+          data: allIndia.map(r => parseFloat(r.value)),
+          borderColor: COLORS.gas,
+          backgroundColor: g,
+          fill: true,
+          tension: 0.4,
+          borderWidth: 2.5,
+          pointRadius: 0,
+          pointHoverRadius: 5
+        }]
+      },
+      options: CHART_DEFAULTS
+    });
+  }
+}
+
+// ===== INIT =====
+loadAll();
+</script>
+</body>
+</html>

@@ -1,0 +1,60 @@
+name: Fetch CEA Data
+
+on:
+  schedule:
+    # Runs daily at 6:00 AM IST (00:30 UTC)
+    - cron: '30 0 * * *'
+  workflow_dispatch: # Allow manual trigger
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Fetch all CEA API endpoints
+        run: |
+          mkdir -p data
+
+          declare -A APIS
+          APIS[installed_capacity_allindia]="https://cea.nic.in/api/installed_capacity_allindia.php"
+          APIS[instcap_res]="https://cea.nic.in/api/instcap_allindia_res.php"
+          APIS[installed_capacity_region]="https://cea.nic.in/api/installed_capacity.php"
+          APIS[installed_capacity_state]="https://cea.nic.in/api/installed_capacity_statewise.php"
+          APIS[capacity_composition]="https://cea.nic.in/api/installed_capacity_composition.php"
+          APIS[power_generation]="https://cea.nic.in/api/power_generation.php"
+          APIS[renewable_energy]="https://cea.nic.in/api/renewable_energy.php"
+          APIS[psp_energy]="https://cea.nic.in/api/psp_energy.php"
+          APIS[psp_peak]="https://cea.nic.in/api/psp_peak.php"
+          APIS[transmission]="https://cea.nic.in/api/transmission_lines.php"
+          APIS[transformation]="https://cea.nic.in/api/transformation_substations.php"
+          APIS[percapita]="https://cea.nic.in/api/percapitalConsumtion.php"
+
+          for name in "${!APIS[@]}"; do
+            url="${APIS[$name]}"
+            echo "Fetching $name..."
+            curl -sk --max-time 60 "$url" -o "data/${name}.json" || echo "WARNING: Failed to fetch $name"
+            # Validate JSON — keep old file if fetch returned invalid data
+            if ! python3 -m json.tool "data/${name}.json" > /dev/null 2>&1; then
+              echo "WARNING: $name returned invalid JSON, reverting"
+              git checkout -- "data/${name}.json" 2>/dev/null || true
+            fi
+          done
+
+          echo "All endpoints fetched."
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/
+          if git diff --staged --quiet; then
+            echo "No data changes detected."
+          else
+            git commit -m "data: update CEA data $(date -u +%Y-%m-%d)"
+            git push
+          fi
