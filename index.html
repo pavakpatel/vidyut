@@ -433,6 +433,32 @@ body::before {
 .chart-container.tall { height: 420px; }
 .chart-container.short { height: 260px; }
 
+
+/* ===== POLICY CAPEX VISUAL ===== */
+.capex-hero {
+  background:
+    linear-gradient(135deg, rgba(16,185,129,0.14), rgba(59,130,246,0.08) 48%, rgba(245,158,11,0.10)),
+    var(--bg-card);
+  border: 1px solid rgba(16,185,129,0.24);
+  border-radius: 24px;
+  padding: 32px;
+  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+}
+.capex-hero::after { content: ''; position: absolute; inset: auto -8% -45% 45%; height: 260px; background: radial-gradient(circle, rgba(16,185,129,0.18), transparent 65%); pointer-events: none; }
+.capex-kicker { color: var(--accent-green); font-size: 0.75rem; font-weight: 800; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 10px; }
+.capex-title { max-width: 980px; font-size: clamp(2rem, 5vw, 4.6rem); line-height: 0.98; letter-spacing: -0.06em; font-weight: 900; text-wrap: balance; }
+.capex-title span { color: var(--accent-amber); }
+.capex-copy { max-width: 760px; color: var(--text-secondary); font-size: 1rem; line-height: 1.7; margin-top: 18px; }
+.capex-stat-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin: 24px 0; }
+.capex-stat { background: rgba(10,14,26,0.48); border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 20px; }
+.capex-stat-value { font-family: 'JetBrains Mono', monospace; font-size: clamp(1.7rem, 3vw, 2.6rem); font-weight: 800; letter-spacing: -0.04em; }
+.capex-stat-label { color: var(--text-muted); font-size: 0.76rem; margin-top: 8px; line-height: 1.5; }
+.capex-source { color: var(--text-muted); font-size: 0.72rem; line-height: 1.6; margin-top: 14px; }
+.capex-table td:first-child, .capex-table th:first-child { font-family: 'Inter', sans-serif; }
+@media (max-width: 768px) { .capex-hero { padding: 24px; } .capex-stat-grid { grid-template-columns: 1fr; } }
+
 /* ===== DATA TABLE ===== */
 .data-table-wrapper {
   background: var(--bg-card);
@@ -801,6 +827,7 @@ tbody tr:hover td {
       <button class="nav-tab" data-section="renewables">Renewables</button>
       <button class="nav-tab" data-section="supply">Supply Position</button>
       <button class="nav-tab" data-section="infrastructure">Infrastructure</button>
+      <button class="nav-tab" data-section="capex">Public Capex</button>
       <button class="nav-tab" data-section="percapita">Per Capita</button>
     </div>
   </nav>
@@ -1118,6 +1145,44 @@ tbody tr:hover td {
       </div>
     </section>
 
+
+    <!-- ===== PUBLIC CAPEX ===== -->
+    <section class="section" id="sec-capex">
+      <div class="capex-hero">
+        <div class="capex-kicker">Union Budget Documents · FY22 to FY26 BE</div>
+        <h2 class="capex-title">Government capex rose <span>89%</span> in four budgets.</h2>
+        <p class="capex-copy">India's budgeted capital expenditure has climbed from ₹5.92 lakh crore in FY22 to ₹11.21 lakh crore in FY26 BE, adding ₹5.29 lakh crore of annual public investment capacity.</p>
+      </div>
+
+      <div class="capex-stat-grid">
+        <div class="capex-stat"><div class="capex-stat-value">₹5.92L cr</div><div class="capex-stat-label">FY22 baseline government capital expenditure</div></div>
+        <div class="capex-stat"><div class="capex-stat-value">₹5.29L cr</div><div class="capex-stat-label">Total increase from FY22 to FY26 BE</div></div>
+        <div class="capex-stat"><div class="capex-stat-value">₹11.21L cr</div><div class="capex-stat-label">FY26 budget estimate, 89% above FY22</div></div>
+      </div>
+
+      <div class="chart-grid">
+        <div class="chart-card full-width">
+          <div class="chart-header">
+            <div><div class="chart-title">Government Capex Waterfall</div><div class="chart-subtitle">Incremental rise from FY22 baseline to FY26 BE, in ₹ lakh crore</div></div>
+            <span class="chart-badge badge-green">+89%</span>
+          </div>
+          <div class="chart-container tall"><canvas id="chartGovCapex"></canvas></div>
+          <div class="capex-source">Source: Union Budget Documents. Figures shown: FY22 ₹5.92L cr; growth additions FY23 ₹1.48L cr, FY24 ₹2.09L cr, FY25 ₹0.69L cr, FY26 ₹1.03L cr; FY26 total BE ₹11.21L cr.</div>
+        </div>
+      </div>
+
+      <div class="data-table-wrapper capex-table">
+        <div class="table-header"><h3>Capex Build-Up</h3><span class="chart-badge badge-amber">₹ lakh crore</span></div>
+        <div class="table-scroll"><table><thead><tr><th>Stage</th><th>Increment</th><th>Running total</th></tr></thead><tbody>
+          <tr><td>FY22 baseline</td><td>—</td><td>5.92</td></tr>
+          <tr><td>FY23 growth</td><td>+1.48</td><td>7.40</td></tr>
+          <tr><td>FY24 growth</td><td>+2.09</td><td>9.49</td></tr>
+          <tr><td>FY25 growth</td><td>+0.69</td><td>10.18</td></tr>
+          <tr><td>FY26 growth</td><td>+1.03</td><td>11.21</td></tr>
+        </tbody></table></div>
+      </div>
+    </section>
+
     <!-- ===== PER CAPITA ===== -->
     <section class="section" id="sec-percapita">
       <h2 class="section-title">Per Capita Consumption</h2>
@@ -1186,6 +1251,7 @@ const API_FILES = {
 };
 const charts = {};
 let allData = {};
+if (window.ChartDataLabels) Chart.register(ChartDataLabels);
 
 // Color palettes
 const COLORS = {
@@ -1365,6 +1431,7 @@ function renderAll() {
   renderRenewablesSection();
   renderSupplySection();
   renderInfraSection();
+  renderCapexSection();
   renderPerCapitaSection();
 }
 
@@ -1852,6 +1919,78 @@ function renderInfraSection() {
       }
     });
   }
+}
+
+// --- PUBLIC CAPEX ---
+function renderCapexSection() {
+  const ctx = document.getElementById('chartGovCapex');
+  if (!ctx) return;
+  if (charts.govCapex) charts.govCapex.destroy();
+
+  const labels = ['FY22', 'FY23 Growth', 'FY24 Growth', 'FY25 Growth', 'FY26 Growth', 'FY26 Total (BE)'];
+  const values = [5.92, 1.48, 2.09, 0.69, 1.03, 11.21];
+  const floating = [[0, 5.92], [5.92, 7.40], [7.40, 9.49], [9.49, 10.18], [10.18, 11.21], [0, 11.21]];
+
+  charts.govCapex = new Chart(ctx.getContext('2d'), {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [{
+        label: 'Government Capex',
+        data: floating,
+        backgroundColor: ['#3b82f6', '#10b981', '#10b981', '#10b981', '#10b981', '#f59e0b'],
+        borderColor: ['#60a5fa', '#34d399', '#34d399', '#34d399', '#34d399', '#fbbf24'],
+        borderWidth: 1.5,
+        borderRadius: 8,
+        borderSkipped: false,
+        barPercentage: 0.68,
+        categoryPercentage: 0.78
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          ...CHART_DEFAULTS.plugins.tooltip,
+          callbacks: {
+            title: items => items[0].label,
+            label: ctx => {
+              const i = ctx.dataIndex;
+              if (i === 0) return ' Baseline: ₹5.92 lakh crore';
+              if (i === labels.length - 1) return ' FY26 BE: ₹11.21 lakh crore';
+              return ` Increase: +₹${values[i].toFixed(2)} lakh crore`;
+            }
+          }
+        },
+        datalabels: {
+          color: '#f1f5f9',
+          anchor: 'end',
+          align: 'top',
+          offset: 4,
+          clamp: true,
+          font: { family: 'JetBrains Mono', weight: '700', size: 12 },
+          formatter: (_, ctx) => {
+            const i = ctx.dataIndex;
+            if (i === 0) return '5.92';
+            if (i === labels.length - 1) return '11.21';
+            return '+' + values[i].toFixed(2);
+          }
+        }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#94a3b8', font: { family: 'Inter', size: 11, weight: '600' } } },
+        y: {
+          min: 0,
+          max: 12,
+          title: { display: true, text: '₹ lakh crore', color: '#64748b', font: { family: 'Inter', size: 11, weight: '600' } },
+          grid: { color: 'rgba(255,255,255,0.06)' },
+          ticks: { color: '#64748b', font: { family: 'JetBrains Mono', size: 10 }, stepSize: 2 }
+        }
+      }
+    }
+  });
 }
 
 // --- PER CAPITA SECTION ---
